@@ -1,0 +1,31 @@
+from Pyfhel import Pyfhel, PyPtxt, PyCtxt
+
+# Initialize Pyfhel
+HE = Pyfhel()
+HE.contextGen(p=65537, m=2**12, base=2, flagBatching=True, sec=128, scheme='CKKS')
+HE.keyGen()
+HE.relinKeyGen()
+
+# Example: Encrypting data
+data_value = 1.0  # Example data value
+divisor = 2.0     # Example divisor
+
+# Encrypt the data value
+data_encrypted = HE.encryptFrac(data_value)
+
+# Instead of dividing by the divisor, multiply by its reciprocal
+reciprocal = 1.0 / divisor  # Calculate reciprocal in plaintext
+
+# Encrypt the reciprocal if necessary (optional based on scenario)
+reciprocal_encrypted = HE.encryptFrac(reciprocal)
+
+# Perform multiplication by the reciprocal instead of division
+result_encrypted = data_encrypted * reciprocal_encrypted  # Encrypted multiplication
+
+# Relinearize if necessary (after multiplication operations)
+result_encrypted = HE.relin(result_encrypted)
+
+# Decrypt the result
+result_decrypted = HE.decryptFrac(result_encrypted)
+
+print(f"Result of division by multiplication with reciprocal: {result_decrypted}")
